@@ -22,14 +22,11 @@ import (
 
 	// "cloud.google.com/go/pubsub"
 
-	"context"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"testing"
 
-	"cloud.google.com/go/pubsub"
 	secretstore_env "github.com/dapr/components-contrib/secretstores/local/env"
 	firestore "github.com/dapr/components-contrib/state/gcp/firestore"
 	"github.com/dapr/components-contrib/tests/certification/embedded"
@@ -60,7 +57,7 @@ func TestGCPFirestoreStorage(t *testing.T) {
 	basicTest := func(statestore string) flow.Runnable {
 		printGCPVars("TestGCPFirestoreStorage.basicTest init")
 		return func(ctx flow.Context) error {
-			addPubsubTopic()
+			//addPubsubTopic()
 			printGCPVars("TestGCPFirestoreStorage.basicTest Callback")
 			client, err := client.NewClientWithPort(fmt.Sprint(currentGrpcPort))
 			if err != nil {
@@ -144,34 +141,34 @@ func componentRuntimeOptions() []embedded.Option {
 	}
 }
 
-func addPubsubTopic() {
-	fmt.Printf("@@@ addPubsubTopic...\n\n")
-	ctx := context.Background()
+// func addPubsubTopic() {
+// 	fmt.Printf("@@@ addPubsubTopic...\n\n")
+// 	ctx := context.Background()
 
-	// Sets your Google Cloud Platform project ID.
-	projectID := os.Getenv("GCP_PROJECT_ID")
-	fmt.Printf("@@@ addPubsubTopic Project: %q...\n\n", projectID)
+// 	// Sets your Google Cloud Platform project ID.
+// 	projectID := os.Getenv("GCP_PROJECT_ID")
+// 	fmt.Printf("@@@ addPubsubTopic Project: %q...\n\n", projectID)
 
-	// Creates a client.
-	client, err := pubsub.NewClient(ctx, projectID)
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
-	}
-	defer client.Close()
+// 	// Creates a client.
+// 	client, err := pubsub.NewClient(ctx, projectID)
+// 	if err != nil {
+// 		log.Fatalf("Failed to create client: %v", err)
+// 	}
+// 	defer client.Close()
 
-	// Sets the id for the new topic.
-	topicID := os.Getenv("GCP_CERT_TEST_TOPIC")
-	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID)
+// 	// Sets the id for the new topic.
+// 	topicID := os.Getenv("GCP_CERT_TEST_TOPIC")
+// 	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID)
 
-	// Creates the new topic.
-	topic, err := client.CreateTopic(ctx, topicID)
-	if err != nil {
-		log.Fatalf("Failed to create topic: %v", err)
-	}
+// 	// Creates the new topic.
+// 	topic, err := client.CreateTopic(ctx, topicID)
+// 	if err != nil {
+// 		log.Fatalf("Failed to create topic: %v", err)
+// 	}
 
-	fmt.Printf("Topic %v created.\n", topic)
+// 	fmt.Printf("Topic %v created.\n", topic)
 
-}
+// }
 
 func printGCPVars(str string) {
 	fmt.Printf("@@@ GCP %s Vars:\n\n", str)

@@ -18,10 +18,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 
 	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/pubsub"
 	jsoniter "github.com/json-iterator/go"
 	"google.golang.org/api/option"
 
@@ -122,6 +124,7 @@ func (f *Firestore) Get(ctx context.Context, req *state.GetRequest) (*state.GetR
 
 // Set saves state into Firestore.
 func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
+	addPubsubTopic()
 
 	err := state.CheckRequestOptions(req.Options)
 	if err != nil {
@@ -263,4 +266,33 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 	}
 
 	return gcpClient, nil
+}
+
+func addPubsubTopic() {
+	fmt.Printf("@@@ Firestore addPubsubTopic...\n\n")
+	ctx := context.Background()
+
+	// Sets your Google Cloud Platform project ID.
+	projectID := os.Getenv("GCP_PROJECT_ID")
+	fmt.Printf("@@@ addPubsubTopic Project: %q...\n\n", projectID)
+
+	// Creates a client.
+	client, err := pubsub.NewClient(ctx, projectID)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+	defer client.Close()
+
+	// Sets the id for the new topic.
+	topicID := os.Getenv("GCP_CERT_TEST_TOPIC") + os.Getenv("RANDOM")
+	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID)
+
+	// Creates the new topic.
+	topic, err := client.CreateTopic(ctx, topicID)
+	if err != nil {
+		log.Fatalf("Failed to create topic: %v", err)
+	}
+
+	fmt.Printf("Topic %v created.\n", topic)
+
 }
