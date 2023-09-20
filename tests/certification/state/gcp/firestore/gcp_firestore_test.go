@@ -60,6 +60,7 @@ func TestGCPFirestoreStorage(t *testing.T) {
 	basicTest := func(statestore string) flow.Runnable {
 		printGCPVars("TestGCPFirestoreStorage.basicTest init")
 		return func(ctx flow.Context) error {
+			addPubsubTopic()
 			printGCPVars("TestGCPFirestoreStorage.basicTest Callback")
 			client, err := client.NewClientWithPort(fmt.Sprint(currentGrpcPort))
 			if err != nil {
@@ -144,11 +145,12 @@ func componentRuntimeOptions() []embedded.Option {
 }
 
 func addPubsubTopic() {
-
+	fmt.Printf("@@@ addPubsubTopic...\n\n")
 	ctx := context.Background()
 
 	// Sets your Google Cloud Platform project ID.
 	projectID := os.Getenv("GCP_PROJECT_ID")
+	fmt.Printf("@@@ addPubsubTopic Project: %q...\n\n", projectID)
 
 	// Creates a client.
 	client, err := pubsub.NewClient(ctx, projectID)
@@ -159,6 +161,7 @@ func addPubsubTopic() {
 
 	// Sets the id for the new topic.
 	topicID := os.Getenv("GCP_CERT_TEST_TOPIC")
+	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID)
 
 	// Creates the new topic.
 	topic, err := client.CreateTopic(ctx, topicID)
