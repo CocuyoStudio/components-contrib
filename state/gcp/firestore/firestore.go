@@ -122,6 +122,7 @@ func (f *Firestore) Get(ctx context.Context, req *state.GetRequest) (*state.GetR
 
 // Set saves state into Firestore.
 func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
+	printGCPVars("Firestore.Set")
 	err := state.CheckRequestOptions(req.Options)
 	if err != nil {
 		return err
@@ -154,6 +155,19 @@ func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
 	}
 
 	return nil
+}
+
+func printGCPVars(str string) {
+	fmt.Printf("@@@ GCP %s Vars:\n\n", str)
+	fmt.Printf("@@@ CLOUDSDK_PROJECT:%q\n\n", os.Getenv("CLOUDSDK_PROJECT"))
+	fmt.Printf("@@@ CLOUDSDK_CORE_PROJECT:%q\n\n", os.Getenv("CLOUDSDK_CORE_PROJECT"))
+	fmt.Printf("@@@ GCP_PROJECT:%q\n\n", os.Getenv("GCP_PROJECT"))
+	fmt.Printf("@@@ GCLOUD_PROJECT:%q\n\n", os.Getenv("GCLOUD_PROJECT"))
+	fmt.Printf("@@@ GOOGLE_CLOUD_PROJECT:%q\n\n", os.Getenv("GOOGLE_CLOUD_PROJECT"))
+	fmt.Printf("@@@ CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:%q\n\n", os.Getenv("CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE"))
+	fmt.Printf("@@@ GOOGLE_APPLICATION_CREDENTIALS:%q\n\n", os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+	fmt.Printf("@@@ GOOGLE_GHA_CREDS_PATH:%q\n\n", os.Getenv("GOOGLE_GHA_CREDS_PATH"))
+
 }
 
 // Delete performs a delete operation.
@@ -229,6 +243,7 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 		}
 	} else {
 		l.Debugf("Using implicit credentials for GCP")
+		printGCPVars("Firestore.getGCPClient")
 
 		// The following allows the Google SDK to connect to
 		// the GCP Datastore Emulator.
