@@ -124,7 +124,7 @@ func (f *Firestore) Get(ctx context.Context, req *state.GetRequest) (*state.GetR
 
 // Set saves state into Firestore.
 func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
-	addPubsubTopic()
+	addPubsubTopic(ctx)
 
 	err := state.CheckRequestOptions(req.Options)
 	if err != nil {
@@ -268,9 +268,9 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 	return gcpClient, nil
 }
 
-func addPubsubTopic() {
+func addPubsubTopic(ctx context.Context) {
 	fmt.Printf("@@@ Firestore addPubsubTopic...\n\n")
-	ctx := context.Background()
+	//ctx := context.Background()
 
 	// Sets your Google Cloud Platform project ID.
 	projectID := os.Getenv("GCP_PROJECT_ID")
