@@ -122,7 +122,7 @@ func (f *Firestore) Get(ctx context.Context, req *state.GetRequest) (*state.GetR
 
 // Set saves state into Firestore.
 func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
-	printGCPVars("Firestore.Set")
+
 	err := state.CheckRequestOptions(req.Options)
 	if err != nil {
 		return err
@@ -148,6 +148,8 @@ func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
 	}
 	key := datastore.NameKey(f.entityKind, req.Key, nil)
 
+	printGCPVars("Firestore.Set-clientPut")
+	fmt.Printf("@@@ Firestore Put Key: %#v Entity: %%v\n\n", key, entity)
 	_, err = f.client.Put(ctx, key, entity)
 
 	if err != nil {
