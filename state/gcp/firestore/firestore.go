@@ -149,10 +149,11 @@ func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
 	key := datastore.NameKey(f.entityKind, req.Key, nil)
 
 	printGCPVars("Firestore.Set-clientPut")
-	fmt.Printf("@@@ Firestore Put Key: %#v Entity: %%v\n\n", key, entity)
+	fmt.Printf("@@@ Firestore Put Key: %#v Entity: %#v\n\n", key, entity)
 	_, err = f.client.Put(ctx, key, entity)
 
 	if err != nil {
+		fmt.Printf("@@@ Firestore Put err: %v\n\n", err)
 		return err
 	}
 
