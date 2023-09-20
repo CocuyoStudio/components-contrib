@@ -37,7 +37,7 @@ jobs:
       run: |
         echo "CHECKOUT_REPO=${{ github.repository }}" >> $GITHUB_ENV
         echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
-        echo "TEST_PATH=tests/certification/firestore" >> $GITHUB_ENV
+        echo "TEST_PATH=tests/certification/state/gcp/firestore" >> $GITHUB_ENV
 
     - name: Check out code
       uses: actions/checkout@v3
