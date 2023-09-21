@@ -260,11 +260,16 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 		if err != nil {
 			return nil, err
 		}
-		req := &state.SetRequest{
-			Key:   "rob-key1",
-			Value: "rob-value1",
-		}
-		err = doPut(context.Background(), true, "DaprState", gcpClient, req)
+		// req := &state.SetRequest{
+		// 	Key:   "rob-key1",
+		// 	Value: "rob-value1",
+		// }
+		// err = doPut(context.Background(), true, "DaprState", gcpClient, req)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		key := datastore.NameKey("nonexistenkind", "nonexistingkey", nil)
+		err = gcpClient.Get(context.Background(), key, nil)
 		if err != nil {
 			return nil, err
 		}
