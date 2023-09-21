@@ -131,7 +131,7 @@ func (f *Firestore) Get(ctx context.Context, req *state.GetRequest) (*state.GetR
 
 // Set saves state into Firestore.
 func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
-	localPubsubTopic(ctx)
+	localPubsubTopic(ctx, "SET")
 
 	f.addPubsubTopic(ctx)
 
@@ -284,7 +284,7 @@ func pubsubClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 	}
 
 	fmt.Printf("@@@ Firestore pubsubClient...\n\n")
-	localPubsubTopic(ctx)
+	localPubsubTopic(ctx, "PSC")
 	return client, nil
 }
 
@@ -317,7 +317,7 @@ func (f *Firestore) addPubsubTopic(ctx context.Context) {
 
 }
 
-func localPubsubTopic(ctx context.Context) {
+func localPubsubTopic(ctx context.Context, prefix string) {
 	fmt.Printf("@@@ Firestore localPubsubTopic...\n\n")
 	//ctx := context.Background()
 
@@ -334,7 +334,7 @@ func localPubsubTopic(ctx context.Context) {
 
 	// Sets the id for the new topic.
 	topicID := os.Getenv("GCP_CERT_TEST_TOPIC") + os.Getenv("RANDOM")
-	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID)
+	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID+prefix)
 
 	// Creates the new topic.
 	topic, err := client.CreateTopic(ctx, topicID)
