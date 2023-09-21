@@ -96,12 +96,6 @@ func (f *Firestore) Init(ctx context.Context, metadata state.Metadata) error {
 	f.entityKind = meta.EntityKind
 	f.noIndex = meta.NoIndex
 
-	psc, err := pubsubClient(ctx, meta, f.logger)
-	if err != nil {
-		return err
-	}
-	f.pubsubClient = psc
-
 	return nil
 }
 
@@ -133,13 +127,23 @@ func (f *Firestore) Get(ctx context.Context, req *state.GetRequest) (*state.GetR
 func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
 	// localPubsubTopic(ctx, "SET")
 
-	f.addPubsubTopic(ctx)
+	//f.addPubsubTopic(ctx)
 
 	err := state.CheckRequestOptions(req.Options)
 	if err != nil {
 		return err
 	}
 
+	err = doPut(ctx, f.noIndex, f.entityKind, f.client, req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func doPut(ctx context.Context, noIndex bool, entityKind string, client *datastore.Client, req *state.SetRequest) error {
+	fmt.Printf("@@@ Firestore.doPut entityKind: %s\n\n", entityKind)
 	var v string
 	b, ok := req.Value.([]byte)
 	if ok {
@@ -149,7 +153,7 @@ func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
 	}
 
 	var entity interface{}
-	if f.noIndex {
+	if noIndex {
 		entity = &StateEntityNoIndex{
 			Value: v,
 		}
@@ -158,16 +162,15 @@ func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
 			Value: v,
 		}
 	}
-	key := datastore.NameKey(f.entityKind, req.Key, nil)
+	key := datastore.NameKey(entityKind, req.Key, nil)
 
 	fmt.Printf("@@@ Firestore Put Key: %#v Entity: %#v\n\n", key, entity)
-	_, err = f.client.Put(ctx, key, entity)
+	_, err := client.Put(ctx, key, entity)
 
 	if err != nil {
 		fmt.Printf("@@@ Firestore Put err: %v\n\n", err)
 		return err
 	}
-
 	return nil
 }
 
@@ -257,6 +260,15 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 		if err != nil {
 			return nil, err
 		}
+		req := &state.SetRequest{
+			Key:   "rob-key",
+			Value: "rob-value",
+		}
+		err = doPut(ctx, true, "DaprState", gcpClient, req)
+		if err != nil {
+			return nil, err
+		}
+
 	}
 
 	return gcpClient, nil
