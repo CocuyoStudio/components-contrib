@@ -55,10 +55,10 @@ func TestGCPFirestoreStorage(t *testing.T) {
 
 	printGCPVars("TestGCPFirestoreStorage start")
 	basicTest := func(statestore string) flow.Runnable {
-		printGCPVars("TestGCPFirestoreStorage.basicTest init")
+		// printGCPVars("TestGCPFirestoreStorage.basicTest init")
 		return func(ctx flow.Context) error {
 			//addPubsubTopic()
-			printGCPVars("TestGCPFirestoreStorage.basicTest Callback")
+			// printGCPVars("TestGCPFirestoreStorage.basicTest Callback")
 			client, err := client.NewClientWithPort(fmt.Sprint(currentGrpcPort))
 			if err != nil {
 				panic(err)
