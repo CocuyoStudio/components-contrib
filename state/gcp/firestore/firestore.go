@@ -131,7 +131,7 @@ func (f *Firestore) Get(ctx context.Context, req *state.GetRequest) (*state.GetR
 
 // Set saves state into Firestore.
 func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
-	localPubsubTopic(ctx, "SET")
+	// localPubsubTopic(ctx, "SET")
 
 	f.addPubsubTopic(ctx)
 
@@ -160,7 +160,6 @@ func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
 	}
 	key := datastore.NameKey(f.entityKind, req.Key, nil)
 
-	printGCPVars("Firestore.Set-clientPut")
 	fmt.Printf("@@@ Firestore Put Key: %#v Entity: %#v\n\n", key, entity)
 	_, err = f.client.Put(ctx, key, entity)
 
@@ -170,19 +169,6 @@ func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
 	}
 
 	return nil
-}
-
-func printGCPVars(str string) {
-	fmt.Printf("@@@ GCP %s Vars:\n\n", str)
-	fmt.Printf("@@@ CLOUDSDK_PROJECT:%q\n\n", os.Getenv("CLOUDSDK_PROJECT"))
-	fmt.Printf("@@@ CLOUDSDK_CORE_PROJECT:%q\n\n", os.Getenv("CLOUDSDK_CORE_PROJECT"))
-	fmt.Printf("@@@ GCP_PROJECT:%q\n\n", os.Getenv("GCP_PROJECT"))
-	fmt.Printf("@@@ GCLOUD_PROJECT:%q\n\n", os.Getenv("GCLOUD_PROJECT"))
-	fmt.Printf("@@@ GOOGLE_CLOUD_PROJECT:%q\n\n", os.Getenv("GOOGLE_CLOUD_PROJECT"))
-	fmt.Printf("@@@ CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:%q\n\n", os.Getenv("CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE"))
-	fmt.Printf("@@@ GOOGLE_APPLICATION_CREDENTIALS:%q\n\n", os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-	fmt.Printf("@@@ GOOGLE_GHA_CREDS_PATH:%q\n\n", os.Getenv("GOOGLE_GHA_CREDS_PATH"))
-
 }
 
 // Delete performs a delete operation.
@@ -258,7 +244,6 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 		}
 	} else {
 		l.Debugf("Using implicit credentials for GCP")
-		printGCPVars("Firestore.getGCPClient")
 
 		// The following allows the Google SDK to connect to
 		// the GCP Datastore Emulator.
@@ -278,7 +263,7 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 }
 
 func pubsubClient(ctx context.Context, metadata *firestoreMetadata, l logger.Logger) (*pubsub.Client, error) {
-	client, err := pubsub.NewClient(ctx, metadata.ProjectID)
+	client, err := pubsub.NewClient(context.Background(), metadata.ProjectID)
 	if err != nil {
 		return nil, err
 	}
@@ -310,10 +295,10 @@ func (f *Firestore) addPubsubTopic(ctx context.Context) {
 	// Creates the new topic.
 	topic, err := f.pubsubClient.CreateTopic(ctx, topicID)
 	if err != nil {
-		log.Fatalf("Failed to create topic: %v", err)
+		fmt.Printf("Failed to create topic: %v", err)
+	} else {
+		fmt.Printf("Topic %v created.\n", topic)
 	}
-
-	fmt.Printf("Topic %v created.\n", topic)
 
 }
 
@@ -339,10 +324,10 @@ func localPubsubTopic(ctx context.Context, prefix string) {
 	// Creates the new topic.
 	topic, err := client.CreateTopic(ctx, topicID)
 	if err != nil {
-		log.Fatalf("Failed to create topic: %v", err)
+		fmt.Printf("Failed to create topic: %v", err)
+	} else {
+		fmt.Printf("Topic %v created.\n", topic)
 	}
-
-	fmt.Printf("Topic %v created.\n", topic)
 
 }
 
@@ -361,9 +346,9 @@ func clientPubsubTopic(ctx context.Context, client *pubsub.Client, prefix string
 	// Creates the new topic.
 	topic, err := client.CreateTopic(ctx, topicID)
 	if err != nil {
-		log.Fatalf("Failed to create topic: %v", err)
+		fmt.Printf("Failed to create topic: %v", err)
+	} else {
+		fmt.Printf("Topic %v created.\n", topic)
 	}
-
-	fmt.Printf("Topic %v created.\n", topic)
 
 }
