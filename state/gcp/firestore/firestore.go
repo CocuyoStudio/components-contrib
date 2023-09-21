@@ -261,10 +261,10 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 			return nil, err
 		}
 		req := &state.SetRequest{
-			Key:   "rob-key",
-			Value: "rob-value",
+			Key:   "rob-key1",
+			Value: "rob-value1",
 		}
-		err = doPut(ctx, true, "DaprState", gcpClient, req)
+		err = doPut(context.Background(), true, "DaprState", gcpClient, req)
 		if err != nil {
 			return nil, err
 		}
