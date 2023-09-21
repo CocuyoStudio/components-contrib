@@ -284,7 +284,7 @@ func pubsubClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 	}
 
 	fmt.Printf("@@@ Firestore pubsubClient...\n\n")
-	localPubsubTopic(context.Background(), "PSC")
+	clientPubsubTopic(context.Background(), client, "PSC")
 	return client, nil
 }
 
@@ -331,6 +331,28 @@ func localPubsubTopic(ctx context.Context, prefix string) {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 	defer client.Close()
+
+	// Sets the id for the new topic.
+	topicID := os.Getenv("GCP_CERT_TEST_TOPIC") + os.Getenv("RANDOM") + prefix
+	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID)
+
+	// Creates the new topic.
+	topic, err := client.CreateTopic(ctx, topicID)
+	if err != nil {
+		log.Fatalf("Failed to create topic: %v", err)
+	}
+
+	fmt.Printf("Topic %v created.\n", topic)
+
+}
+
+func clientPubsubTopic(ctx context.Context, client *pubsub.Client, prefix string) {
+	fmt.Printf("@@@ Firestore clientPubsubTopic...\n\n")
+	//ctx := context.Background()
+
+	// Sets your Google Cloud Platform project ID.
+	projectID := os.Getenv("GCP_PROJECT_ID")
+	fmt.Printf("@@@ addPubsubTopic Project: %q...\n\n", projectID)
 
 	// Sets the id for the new topic.
 	topicID := os.Getenv("GCP_CERT_TEST_TOPIC") + os.Getenv("RANDOM") + prefix
