@@ -282,6 +282,9 @@ func pubsubClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("@@@ Firestore pubsubClient...\n\n")
+	localPubsubTopic(ctx)
 	return client, nil
 }
 
