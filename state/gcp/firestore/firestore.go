@@ -284,7 +284,7 @@ func pubsubClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 	}
 
 	fmt.Printf("@@@ Firestore pubsubClient...\n\n")
-	localPubsubTopic(ctx, "PSC")
+	localPubsubTopic(context.Background(), "PSC")
 	return client, nil
 }
 
