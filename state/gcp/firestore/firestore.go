@@ -333,8 +333,8 @@ func localPubsubTopic(ctx context.Context, prefix string) {
 	defer client.Close()
 
 	// Sets the id for the new topic.
-	topicID := os.Getenv("GCP_CERT_TEST_TOPIC") + os.Getenv("RANDOM")
-	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID+prefix)
+	topicID := os.Getenv("GCP_CERT_TEST_TOPIC") + os.Getenv("RANDOM") + prefix
+	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID)
 
 	// Creates the new topic.
 	topic, err := client.CreateTopic(ctx, topicID)
