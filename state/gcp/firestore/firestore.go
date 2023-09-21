@@ -41,10 +41,11 @@ const (
 type Firestore struct {
 	state.BulkStore
 
-	client     *datastore.Client
-	entityKind string
-	noIndex    bool
-	logger     logger.Logger
+	client       *datastore.Client
+	pubsubClient *pubsub.Client
+	entityKind   string
+	noIndex      bool
+	logger       logger.Logger
 }
 
 type firestoreMetadata struct {
@@ -95,6 +96,12 @@ func (f *Firestore) Init(ctx context.Context, metadata state.Metadata) error {
 	f.entityKind = meta.EntityKind
 	f.noIndex = meta.NoIndex
 
+	psc, err := pubsubClient(ctx, meta, f.logger)
+	if err != nil {
+		return err
+	}
+	f.pubsubClient = psc
+
 	return nil
 }
 
@@ -124,7 +131,7 @@ func (f *Firestore) Get(ctx context.Context, req *state.GetRequest) (*state.GetR
 
 // Set saves state into Firestore.
 func (f *Firestore) Set(ctx context.Context, req *state.SetRequest) error {
-	addPubsubTopic(ctx)
+	f.addPubsubTopic(ctx)
 
 	err := state.CheckRequestOptions(req.Options)
 	if err != nil {
@@ -268,8 +275,16 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 	return gcpClient, nil
 }
 
-func addPubsubTopic(ctx context.Context) {
-	fmt.Printf("@@@ Firestore addPubsubTopic...\n\n")
+func pubsubClient(ctx context.Context, metadata *firestoreMetadata, l logger.Logger) (*pubsub.Client, error) {
+	client, err := pubsub.NewClient(ctx, metadata.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
+func (f *Firestore) addPubsubTopic(ctx context.Context) {
+	fmt.Printf("@@@ Firestore addPubsubTopic-2...\n\n")
 	//ctx := context.Background()
 
 	// Sets your Google Cloud Platform project ID.
@@ -277,18 +292,18 @@ func addPubsubTopic(ctx context.Context) {
 	fmt.Printf("@@@ addPubsubTopic Project: %q...\n\n", projectID)
 
 	// Creates a client.
-	client, err := pubsub.NewClient(ctx, projectID)
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
-	}
-	defer client.Close()
+	// client, err := pubsub.NewClient(ctx, projectID)
+	// if err != nil {
+	// 	log.Fatalf("Failed to create client: %v", err)
+	// }
+	// defer client.Close()
 
 	// Sets the id for the new topic.
 	topicID := os.Getenv("GCP_CERT_TEST_TOPIC") + os.Getenv("RANDOM")
 	fmt.Printf("@@@ addPubsubTopic Topic: %q...\n\n", topicID)
 
 	// Creates the new topic.
-	topic, err := client.CreateTopic(ctx, topicID)
+	topic, err := f.pubsubClient.CreateTopic(ctx, topicID)
 	if err != nil {
 		log.Fatalf("Failed to create topic: %v", err)
 	}
