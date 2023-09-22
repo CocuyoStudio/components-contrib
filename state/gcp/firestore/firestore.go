@@ -269,7 +269,9 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 		// 	return nil, err
 		// }
 		key := datastore.NameKey("nonexistenkind", "nonexistingkey", nil)
-		dst := struct{}{}
+		dst := struct {
+			Nonexistingkey string
+		}{}
 		err = gcpClient.Get(context.Background(), key, &dst)
 		if err != nil {
 			return nil, err
