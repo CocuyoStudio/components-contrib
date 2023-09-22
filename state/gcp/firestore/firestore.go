@@ -272,6 +272,7 @@ func getGCPClient(ctx context.Context, metadata *firestoreMetadata, l logger.Log
 		dst := &Nonexistenkind{}
 		err = gcpClient.Get(context.Background(), key, &dst)
 		if err != nil {
+			fmt.Printf("@@@ getGCPClient error pinging EntityKind %q : %#v\n", metadata.EntityKind, err)
 			return nil, err
 		}
 
